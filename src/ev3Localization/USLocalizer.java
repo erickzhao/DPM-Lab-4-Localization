@@ -35,6 +35,10 @@ public class USLocalizer {
 			// angles to the right of angleB is 45 degrees past 'north'
 			
 			// update the odometer position (example to follow:)
+			
+			
+			
+			
 			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
 		} else {
 			/*

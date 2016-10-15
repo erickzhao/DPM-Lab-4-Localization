@@ -13,11 +13,11 @@ public class LocalizationLab {
 	// Left motor connected to output A
 	// Right motor connected to output D
 	// Ultrasonic sensor port connected to input S1
-	// Color sensor port connected to input S2
+	// Color sensor port connected to input S4
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
-	private static final Port colorPort = LocalEV3.get().getPort("S2");		
+	private static final Port colorPort = LocalEV3.get().getPort("S4");		
 	
 	public static final double WHEEL_RADIUS = 2.13;
 	public static final double WHEEL_BASE = 15.13;
@@ -47,6 +47,10 @@ public class LocalizationLab {
 		// setup the odometer and display
 		Odometer odo = new Odometer(leftMotor, rightMotor, 30, true);
 		LCDInfo lcd = new LCDInfo(odo);
+		
+		Navigation nav = new Navigation(odo);
+		
+		nav.turnTo(0, true);
 		
 		// perform the ultrasonic localization
 		USLocalizer usl = new USLocalizer(odo, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE);
