@@ -12,7 +12,10 @@ public class USLocalizer {
 	private LocalizationType locType;
 	private Navigation nav;
 	
-	private static final float MAX_DISTANCE = 30;
+	private boolean noiseZone = false;
+	private static final float MAX_DISTANCE = 50;
+	private static final float EDGE_DISTANCE = 20;
+	private static final float MARGIN_DISTANCE = 1;
 	private static final float MOTOR_SPEED = 50;
 	
 	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType) {
@@ -25,7 +28,8 @@ public class USLocalizer {
 	
 	public void doLocalization() {
 		double [] pos = new double [3];
-		double angleA, angleB;
+		double angleA = 0;
+		double angleB = 0;
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
 			
@@ -35,23 +39,27 @@ public class USLocalizer {
 			
 			while (true) {
 				if (getFilteredData()>=MAX_DISTANCE) {
-					nav.setSpeeds(0,0);
 					break;
 				}
 			}
 			// keep rotating until the robot sees a wall, then latch the angle
 			
-			nav.setSpeeds(MOTOR_SPEED,-MOTOR_SPEED);
+		
 			
 			while (true) {
-				if (getFilteredData()<MAX_DISTANCE) {
-					nav.setSpeeds(0,0);
+				if (!noiseZone && getFilteredData()<EDGE_DISTANCE+MARGIN_DISTANCE) {
+					angleA = odo.getAng();
+					noiseZone = true;
+					Sound.beep();
+				} else if ( getFilteredData()<EDGE_DISTANCE-MARGIN_DISTANCE){
+					angleA = (angleA + odo.getAng())/2;
+					noiseZone = false;
+					Sound.beep();
 					break;
 				}
 			}
 			
-			angleA = odo.getAng();
-			Sound.beep();
+			
 			
 			// switch direction and wait until it sees no wall
 			
@@ -59,24 +67,27 @@ public class USLocalizer {
 			
 			while (true) {
 				if (getFilteredData()>=MAX_DISTANCE) {
-					nav.setSpeeds(0,0);
 					break;
 				}
 			}
 			
 			// keep rotating until the robot sees a wall, then latch the angle
 			
-			nav.setSpeeds(-MOTOR_SPEED,MOTOR_SPEED);
+
 			
 			while (true) {
-				if (getFilteredData()<MAX_DISTANCE) {
-					nav.setSpeeds(0,0);
+				if (!noiseZone && getFilteredData()<EDGE_DISTANCE+MARGIN_DISTANCE) {
+					angleB = odo.getAng();
+					noiseZone = true;
+					Sound.beep();
+				} else if ( getFilteredData()<EDGE_DISTANCE-MARGIN_DISTANCE){
+					angleB = (angleB + odo.getAng())/2;
+					noiseZone = false;
+					Sound.beep();
 					break;
 				}
 			}
 			
-			angleB = odo.getAng();
-			Sound.beep();
 			
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
@@ -117,10 +128,10 @@ public class USLocalizer {
 	}
 	
 	private double getEndAngle(double a, double b) {
-//		if (a > b) {
-//			return (odo.getAng()+225-(a+b)/2);
-//		}
-		return (odo.getAng()+45-(a+b)/2);
+		if (a > b) {
+			return ((a+b)/2-225);
+		}
+		return ((a+b)/2-45);
 	}
 
 }
