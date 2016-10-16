@@ -48,7 +48,7 @@ public class LocalizationLab {
 		Odometer odo = new Odometer(leftMotor, rightMotor, 30, true);
 		
 		// perform the ultrasonic localization
-		USLocalizer usl = new USLocalizer(odo, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE);
+		USLocalizer usl = new USLocalizer(odo, usValue, usData, USLocalizer.LocalizationType.RISING_EDGE);
 		LCDInfo lcd = new LCDInfo(odo,usl);
 		usl.doLocalization();
 		

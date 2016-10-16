@@ -14,7 +14,9 @@ public class USLocalizer {
 	
 	private boolean noiseZone = false;
 	private static final float MAX_DISTANCE = 50;
+	private static final float WALL_DISTANCE = 18;
 	private static final float EDGE_DISTANCE = 20;
+	private static final float EDGE_DISTANCE_R = 33;
 	private static final float MARGIN_DISTANCE = 1;
 	private static final float MOTOR_SPEED = 50;
 	
@@ -112,9 +114,57 @@ public class USLocalizer {
 			 * will face toward the wall for most of it.
 			 */
 			
-			//
-			// FILL THIS IN
-			//
+			nav.setSpeeds(MOTOR_SPEED,-MOTOR_SPEED);
+			
+			while (true) {
+				if (getFilteredData()<=WALL_DISTANCE) {
+					break;
+				}
+			}
+			while (true) {
+				if (!noiseZone && getFilteredData()>EDGE_DISTANCE_R-MARGIN_DISTANCE) {
+					angleB = odo.getAng();
+					noiseZone = true;
+					Sound.beep();
+				} else if ( getFilteredData()>EDGE_DISTANCE_R+MARGIN_DISTANCE){
+					angleB = (angleB + odo.getAng())/2;
+					noiseZone = false;
+					Sound.beep();
+					break;
+				}
+			}
+			
+			nav.setSpeeds(-MOTOR_SPEED,MOTOR_SPEED);
+			
+			while (true) {
+				if (getFilteredData()<=WALL_DISTANCE) {
+					break;
+				}
+			}
+			while (true) {
+				if (!noiseZone && getFilteredData()>EDGE_DISTANCE_R-MARGIN_DISTANCE) {
+					angleA = odo.getAng();
+					noiseZone = true;
+					Sound.beep();
+				} else if ( getFilteredData()>EDGE_DISTANCE_R+MARGIN_DISTANCE){
+					angleA = (angleA + odo.getAng())/2;
+					noiseZone = false;
+					Sound.beep();
+					break;
+				}
+			}
+			
+			double endAngle = getEndAngle(angleA,angleB);
+			if (endAngle<0) {
+				nav.turnTo(endAngle+360,true);
+			} else if (endAngle>360){
+				nav.turnTo(endAngle-360,true);
+			} else {
+				nav.turnTo(endAngle, true);
+			}
+			
+			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
+
 		}
 	}
 	
@@ -129,9 +179,11 @@ public class USLocalizer {
 	
 	private double getEndAngle(double a, double b) {
 		if (a > b) {
-			return ((a+b)/2-225);
+			return ((a+b)/2 - 225);
 		}
-		return ((a+b)/2-45);
+		return ((a+b)/2 - 45);
 	}
+	
+	
 
 }
