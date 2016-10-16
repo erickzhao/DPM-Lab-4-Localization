@@ -12,6 +12,9 @@ public class USLocalizer {
 	private LocalizationType locType;
 	private Navigation nav;
 	
+	private static final float MAX_DISTANCE = 30;
+	private static final float MOTOR_SPEED = 50;
+	
 	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType) {
 		this.odo = odo;
 		this.usSensor = usSensor;
@@ -28,20 +31,20 @@ public class USLocalizer {
 			
 			// rotate the robot until it sees no wall
 			
-			nav.setSpeeds(75,-75);
+			nav.setSpeeds(MOTOR_SPEED,-MOTOR_SPEED);
 			
 			while (true) {
-				if (getFilteredData()>=50) {
+				if (getFilteredData()>=MAX_DISTANCE) {
 					nav.setSpeeds(0,0);
 					break;
 				}
 			}
 			// keep rotating until the robot sees a wall, then latch the angle
 			
-			nav.setSpeeds(75,-75);
+			nav.setSpeeds(MOTOR_SPEED,-MOTOR_SPEED);
 			
 			while (true) {
-				if (getFilteredData()<50) {
+				if (getFilteredData()<MAX_DISTANCE) {
 					nav.setSpeeds(0,0);
 					break;
 				}
@@ -52,10 +55,10 @@ public class USLocalizer {
 			
 			// switch direction and wait until it sees no wall
 			
-			nav.setSpeeds(-75,75);
+			nav.setSpeeds(-MOTOR_SPEED,MOTOR_SPEED);
 			
 			while (true) {
-				if (getFilteredData()>=50) {
+				if (getFilteredData()>=MAX_DISTANCE) {
 					nav.setSpeeds(0,0);
 					break;
 				}
@@ -63,10 +66,10 @@ public class USLocalizer {
 			
 			// keep rotating until the robot sees a wall, then latch the angle
 			
-			nav.setSpeeds(-75,75);
+			nav.setSpeeds(-MOTOR_SPEED,MOTOR_SPEED);
 			
 			while (true) {
-				if (getFilteredData()<50) {
+				if (getFilteredData()<MAX_DISTANCE) {
 					nav.setSpeeds(0,0);
 					break;
 				}
@@ -78,11 +81,13 @@ public class USLocalizer {
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			
-			double endAngle = odo.getAng()+45-(angleA+angleB)/2;
+			double endAngle = getEndAngle(angleA,angleB);
 			if (endAngle<0) {
-				nav.turnTo(360+endAngle,true);
+				nav.turnTo(endAngle+360,true);
+			} else if (endAngle>360){
+				nav.turnTo(endAngle-360,true);
 			} else {
-				nav.turnTo(endAngle,true);
+				nav.turnTo(endAngle, true);
 			}
 			
 			// update the odometer position (example to follow:)
@@ -102,13 +107,20 @@ public class USLocalizer {
 		}
 	}
 	
-	private float getFilteredData() {
+	public float getFilteredData() {
 		usSensor.fetchSample(usData, 0);
 		float distance = usData[0]*100;
 		
-		if (distance > 50) distance = 50;
+		if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
 				
 		return distance;
+	}
+	
+	private double getEndAngle(double a, double b) {
+//		if (a > b) {
+//			return (odo.getAng()+225-(a+b)/2);
+//		}
+		return (odo.getAng()+45-(a+b)/2);
 	}
 
 }
