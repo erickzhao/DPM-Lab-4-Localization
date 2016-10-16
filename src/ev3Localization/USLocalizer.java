@@ -78,7 +78,12 @@ public class USLocalizer {
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			
-			nav.turnTo((angleA+angleB)/2-45,true);
+			double endAngle = odo.getAng()+45-(angleA+angleB)/2;
+			if (endAngle<0) {
+				nav.turnTo(360+endAngle,true);
+			} else {
+				nav.turnTo(endAngle,true);
+			}
 			
 			// update the odometer position (example to follow:)
 			
