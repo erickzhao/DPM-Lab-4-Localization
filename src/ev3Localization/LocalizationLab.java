@@ -52,6 +52,9 @@ public class LocalizationLab {
 		LCDInfo lcd = new LCDInfo(odo,usl);
 		usl.doLocalization();
 		
+		//Wait for button-press while a TA examine the robot
+		while(Button.waitForAnyPress() != Button.ID_ENTER);
+		
 		// perform the light sensor localization
 		LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData);
 		lsl.doLocalization();			
