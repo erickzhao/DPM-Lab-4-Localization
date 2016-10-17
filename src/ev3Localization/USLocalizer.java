@@ -15,9 +15,9 @@ public class USLocalizer {
 	private boolean noiseZone = false;
 	private static final float MAX_DISTANCE = 50;
 	private static final float WALL_DISTANCE = 18;
-	private static final float EDGE_DISTANCE = 9;
+	private static final float EDGE_DISTANCE = (float) 10.4;
 	private static final float EDGE_DISTANCE_R = 33;
-	private static final float MARGIN_DISTANCE = 1; 
+	private static final float MARGIN_DISTANCE = (float) 0.25; 
 	private static final float MOTOR_SPEED = 75;
 	
 	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType) {

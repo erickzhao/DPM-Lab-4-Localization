@@ -11,8 +11,8 @@ public class LightLocalizer {
 	
 	private static final float MOTOR_SPEED = 75;
 	private static final double ARM_LENGTH = 6.3;
-	private static final double CENTER_TO_SENSOR = 10.2;
-	private static final long CORRECTION_PERIOD = 255;
+	private static final double CENTER_TO_SENSOR = 4;
+	private static final long CORRECTION_PERIOD = 333;
 	private static final float BLACK = (float) 0.26;
 	
 	public LightLocalizer(Odometer odo, SampleProvider colorSensor, float[] colorData) {
@@ -95,6 +95,10 @@ public class LightLocalizer {
 					angleB = odo.getAng();
 					PC = 0;
 					Sound.beep();
+					// Make sure the robot won't detect the same line twice
+					try {
+						Thread.sleep(CORRECTION_PERIOD);
+					} catch (InterruptedException e) {}
 					break;
 				}
 				// Make sure the robot won't detect the same line twice
