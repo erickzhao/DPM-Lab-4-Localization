@@ -15,10 +15,10 @@ public class USLocalizer {
 	private boolean noiseZone = false;
 	private static final float MAX_DISTANCE = 50;
 	private static final float WALL_DISTANCE = 18;
-	private static final float EDGE_DISTANCE = 20;
+	private static final float EDGE_DISTANCE = 9;
 	private static final float EDGE_DISTANCE_R = 33;
-	private static final float MARGIN_DISTANCE = 1;
-	private static final float MOTOR_SPEED = 50;
+	private static final float MARGIN_DISTANCE = 1; 
+	private static final float MOTOR_SPEED = 75;
 	
 	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType) {
 		this.odo = odo;
@@ -32,6 +32,7 @@ public class USLocalizer {
 		double [] pos = new double [3];
 		double angleA = 0;
 		double angleB = 0;
+
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
 			
